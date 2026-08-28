@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Quest | MarketScholar</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* 2. Budget Quest Palette */
+:root {
+  --primary-accent: #00F5D4;   /* Neon Emerald Teal */
+  --secondary-accent: #7B2CBF; /* Deep Purple */
+  --badge-gold: #FFD166;
+}
+
+.quest-card:hover {
+  border: 2px solid var(--primary-accent);
+  box-shadow: 0 0 15px rgba(0, 245, 212, 0.3);
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+}
+        :root {
+            --bg-dark: #070814;
+            --card-bg: rgba(20, 23, 43, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-amber: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background: rgba(11, 13, 28, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand { font-weight: 800; color: #fff !important; }
+        .nav-link { color: var(--text-muted) !important; font-weight: 500; }
+        .nav-link:hover, .nav-link.active { color: #fff !important; }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .choice-btn {
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            color: #ffffff;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: left;
+            padding: 18px 24px;
+            border-radius: 14px;
+        }
+
+        .choice-btn:hover {
+            background: rgba(139, 92, 246, 0.22);
+            border-color: var(--accent-purple);
+            transform: translateY(-2px);
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.25);
+        }
+
+        .log-item {
+            border-left: 3px solid var(--accent-purple);
+            background: rgba(10, 12, 26, 0.6);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.88rem;
+            color: #e2e8f0;
+        }
+        .log-item.expense { border-left-color: var(--accent-red); }
+        .log-item.income { border-left-color: var(--accent-green); }
+
+        .modal-content-dark {
+            background: #0f1226;
+            border: 1px solid var(--card-border);
+            color: #fff;
+            border-radius: 20px;
+        }
+
+        .form-control-dark, .form-select-dark {
+            background: rgba(10, 12, 26, 0.8);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            border-radius: 10px;
+        }
+        .form-control-dark:focus, .form-select-dark:focus {
+            background: rgba(15, 18, 38, 0.9);
+            border-color: var(--accent-purple);
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25);
+        }
+        body {
+            color: white !important; /* or #ffffff */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <span style="color: var(--accent-purple);">❖</span> MarketScholar
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/dashboard">Trading Floor</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/budget">Budget Quest</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/learn">Knowledge Hub</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        
+        <!-- Header & Controls -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div>
+                <h2 class="fw-bold text-white mb-1">🎮 Budget Quest: CYOA Simulator</h2>
+                <p class="text-muted mb-0">Navigate real-life financial tradeoffs and optimize your checking vs. credit balances.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-light btn-sm px-3 fw-semibold" style="border-radius: 10px;" data-bs-toggle="modal" data-bs-target="#setupModal">⚙️ Quest Settings</button>
+                <button class="btn btn-outline-secondary btn-sm px-3 fw-semibold" style="border-radius: 10px;" onclick="resetQuest()">Restart Simulation</button>
+            </div>
+        </div>
+
+        <!-- Real-Time Metrics Bar -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="glass-card p-3 text-center">
+                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Checking Balance</span>
+                    <h4 class="fw-bold mb-0" style="color: var(--accent-green);" id="statCash">$0.00</h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-card p-3 text-center">
+                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Credit Card Debt</span>
+                    <h4 class="fw-bold mb-0" style="color: var(--accent-red);" id="statDebt">$0.00</h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-card p-3 text-center">
+                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Happiness Score</span>
+                    <h4 class="fw-bold mb-0" style="color: var(--accent-amber);" id="statHappiness">80% 😊</h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-card p-3 text-center">
+                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Day Progress</span>
+                    <h4 class="fw-bold mb-0 text-white" id="statDay">Day 1 of 30</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Game Area -->
+        <div class="row">
+            <!-- Scenario & Choices Card -->
+            <div class="col-lg-8 mb-4">
+                <div class="glass-card p-4 h-100" id="gameCard">
+                    <!-- Progress Bar -->
+                    <div class="progress mb-4" style="height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                        <div id="dayProgressBar" class="progress-bar" style="width: 0%; background: linear-gradient(90deg, #8b5cf6, #6366f1); border-radius: 10px;"></div>
+                    </div>
+
+                    <!-- Scenario Content -->
+                    <div id="scenarioContainer">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="display-5 me-3" id="scenarioIcon">☕</span>
+                            <div>
+                                <span class="badge mb-1 px-3 py-1" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3);" id="scenarioTag">Day 1</span>
+                                <h3 class="fw-bold text-white mb-0" id="scenarioTitle">Loading Scenario...</h3>
+                            </div>
+                        </div>
+                        <p class="lead text-muted mb-4" id="scenarioDescription" style="font-size: 1.05rem;">Loading scenario details...</p>
+
+                        <!-- Choices List -->
+                        <div class="d-grid gap-3" id="choicesContainer"></div>
+                    </div>
+
+                    <!-- Game Finished View -->
+                    <div id="endGameContainer" style="display: none;" class="text-center py-4">
+                        <span class="display-1">🏆</span>
+                        <h2 class="fw-bold text-white mt-3 mb-2" id="endGameTitle">Simulation Complete!</h2>
+                        <p class="text-muted mb-4">Here is your final financial breakdown.</p>
+                        
+                        <div class="p-4 rounded-3 text-start mb-4" style="background: rgba(10, 12, 26, 0.7); border: 1px solid var(--card-border);">
+                            <h5 class="fw-bold text-white mb-3">Financial Performance Report</h5>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Final Bank Balance:</span>
+                                <strong class="text-white" id="finalCash">$0.00</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Remaining Credit Debt:</span>
+                                <strong style="color: var(--accent-red);" id="finalDebt">$0.00</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Final Happiness Score:</span>
+                                <strong style="color: var(--accent-amber);" id="finalHappiness">0%</strong>
+                            </div>
+                            <hr style="border-color: var(--card-border);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-white">Financial Persona Title:</span>
+                                <span class="badge bg-success fs-6 px-3 py-2" id="personaBadge">Smart Saver</span>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg fw-bold px-5" style="background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 9999px;" onclick="resetQuest()">Play Again / Change Track</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decision History Feed -->
+            <div class="col-lg-4 mb-4">
+                <div class="glass-card p-4 h-100">
+                    <h5 class="fw-bold text-white mb-3">Decision Log</h5>
+                    <div id="actionLog" style="max-height: 480px; overflow-y: auto;">
+                        <p class="text-muted small">Decisions will appear here as you play.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Setup Customization Modal -->
+    <div class="modal fade" id="setupModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content modal-content-dark">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title fw-bold text-white">⚙️ Quest Personalization</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="setupForm">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">SELECT SIMULATION TRACK</label>
+                            <select id="durationSelect" class="form-select form-select-dark">
+                                <option value="15">15-Day Express Challenge (Student / Sprint Track)</option>
+                                <option value="30" selected>30-Day Monthly Standard (Balanced Life Track)</option>
+                                <option value="60">60-Day Long-Term Journey (Marathon Strategy Track)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">STARTING CHECKING ACCOUNT BALANCE ($)</label>
+                            <input type="number" id="cashInput" class="form-control form-control-dark" value="1200.00" step="50">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold">STARTING CREDIT CARD DEBT ($)</label>
+                            <input type="number" id="debtInput" class="form-control form-control-dark" value="1500.00" step="50">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-top border-secondary">
+                    <button type="button" class="btn btn-outline-light btn-sm px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary btn-sm px-4 fw-bold" style="background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none;" onclick="applySetup()">Start Quest</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const track15 = Array.from({ length: 15 }, (_, i) => {
+            const day = i + 1;
+            const pool = [
+                { icon: "🚲", tag: `Day ${day} - Commute`, title: "Transportation Choice", desc: "How do you want to commute today?", choices: [{ text: "Take public transit ($2.75)", cost: 2.75, debt: 0, happy: 0, log: "Took transit (-$2.75)" }, { text: "Rideshare app Uber ($22.00)", cost: 22.00, debt: 0, happy: 6, log: "Rideshare Uber (-$22.00)" }] },
+                { icon: "🥪", tag: `Day ${day} - Snack Break`, title: "Mid-Day Hunger", desc: "You are feeling hungry between meetings.", choices: [{ text: "Buy vending machine snack ($3.00)", cost: 3.00, debt: 0, happy: 1, log: "Vending snack (-$3.00)" }, { text: "Artisanal bakery pastry ($8.50)", cost: 8.50, debt: 0, happy: 5, log: "Bakery pastry (-$8.50)" }] },
+                { icon: "📱", tag: `Day ${day} - Tech Screen`, title: "Cracked Screen", desc: "Dropped your phone! Do you fix it now or wait?", choices: [{ text: "Repair at local shop ($85.00)", cost: 85.00, debt: 0, happy: 5, log: "Repaired phone screen (-$85.00)" }, { text: "Use cracked phone for now ($0.00)", cost: 0, debt: 0, happy: -4, log: "Kept cracked phone ($0.00)" }] },
+                { icon: "🎧", tag: `Day ${day} - Music`, title: "Concert Ticket Sale", desc: "An indie band you like is playing locally.", choices: [{ text: "Buy general admission ticket ($35.00)", cost: 35.00, debt: 0, happy: 10, log: "Bought concert ticket (-$35.00)" }, { text: "Stay home & stream album ($0.00)", cost: 0, debt: 0, happy: 0, log: "Skipped concert ($0.00)" }] },
+                { icon: "📚", tag: `Day ${day} - Learning`, title: "Online Certification Course", desc: "A career development course is on sale.", choices: [{ text: "Purchase course ($49.00)", cost: 49.00, debt: 0, happy: 7, log: "Invested in online course (-$49.00)" }, { text: "Use free YouTube tutorials ($0.00)", cost: 0, debt: 0, happy: 2, log: "Used free tutorials ($0.00)" }] }
+            ];
+            return pool[i % pool.length];
+        });
+
+        const track30 = Array.from({ length: 30 }, (_, i) => {
+            const day = i + 1;
+            if (day === 1) return { icon: "☕", tag: "Day 1 - Morning", title: "Morning Coffee", desc: "Start of a 30-day run. Need coffee?", choices: [{ text: "Brew at home ($0.50)", cost: 0.50, debt: 0, happy: 0, log: "Brewed home coffee (-$0.50)" }, { text: "Starbucks Drive-Thru ($6.50)", cost: 6.50, debt: 0, happy: 5, log: "Starbucks drive-thru (-$6.50)" }] };
+            if (day === 15) return { icon: "💰", tag: "Day 15 - Mid-Month", title: "Payday Direct Deposit", desc: "Mid-month paycheck ($1,500) has arrived!", choices: [{ text: "Put $300 to credit card debt & save rest", cost: -1200.00, debt: -300.00, happy: 8, log: "Payday! Paid $300 debt & kept cash" }, { text: "Keep entire paycheck in checking", cost: -1500.00, debt: 0, happy: 4, log: "Payday! Kept $1500 cash in checking" }] };
+            
+            return {
+                icon: day % 2 === 0 ? "🥗" : "🛒",
+                tag: `Day ${day}`,
+                title: day % 2 === 0 ? "Meal Choice" : "General Expense",
+                desc: `Day ${day} decision: Manage cashflow carefully.`,
+                choices: [
+                    { text: "Frugal option ($10.00)", cost: 10.00, debt: 0, happy: 1, log: `Day ${day} Frugal selection (-$10.00)` },
+                    { text: "Upgraded option ($35.00)", cost: 35.00, debt: 0, happy: 6, log: `Day ${day} Upgraded selection (-$35.00)` }
+                ]
+            };
+        });
+
+        const track60 = Array.from({ length: 60 }, (_, i) => {
+            const day = i + 1;
+            return {
+                icon: day % 5 === 0 ? "🏦" : "🚗",
+                tag: `Day ${day} - Marathon`,
+                title: day % 5 === 0 ? "Long-Term Investment/Debt" : "Daily Living Decision",
+                desc: `Day ${day} of 60: Balancing endurance and short term joy.`,
+                choices: [
+                    { text: "Conservative Choice ($15.00)", cost: 15.00, debt: 0, happy: 2, log: `Day ${day} Conservative choice (-$15.00)` },
+                    { text: "Comfort Choice ($45.00)", cost: 45.00, debt: 0, happy: 8, log: `Day ${day} Comfort choice (-$45.00)` }
+                ]
+            };
+        });
+
+        const tracks = { "15": track15, "30": track30, "60": track60 };
+
+        let state = JSON.parse(localStorage.getItem('marketScholar_cyoa_v2_state')) || {
+            duration: "30",
+            day: 1,
+            cash: 1200.00,
+            debt: 1500.00,
+            happiness: 80,
+            log: []
+        };
+
+        document.addEventListener('DOMContentLoaded', renderUI);
+
+        function renderUI() {
+            const currentTrack = tracks[state.duration] || track30;
+            const totalDays = currentTrack.length;
+
+            if (state.day > totalDays) {
+                showEndGameScreen();
+                return;
+            }
+
+            const fmt = num => '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('statCash').innerText = fmt(state.cash);
+            document.getElementById('statDebt').innerText = fmt(state.debt);
+            document.getElementById('statHappiness').innerText = `${state.happiness}%`;
+            document.getElementById('statDay').innerText = `Day ${state.day} of ${totalDays}`;
+
+            document.getElementById('dayProgressBar').style.width = `${(state.day / totalDays) * 100}%`;
+
+            const cur = currentTrack[state.day - 1];
+            document.getElementById('scenarioIcon').innerText = cur.icon;
+            document.getElementById('scenarioTag').innerText = cur.tag;
+            document.getElementById('scenarioTitle').innerText = cur.title;
+            document.getElementById('scenarioDescription').innerText = cur.desc;
+
+            const choicesDiv = document.getElementById('choicesContainer');
+            choicesDiv.innerHTML = '';
+            cur.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = `btn choice-btn fw-bold`;
+                btn.onclick = () => makeChoice(choice);
+                btn.innerHTML = `👉 ${choice.text}`;
+                choicesDiv.appendChild(btn);
+            });
+
+            renderLog();
+        }
+
+        function makeChoice(choice) {
+            state.cash -= choice.cost;
+            state.debt += choice.debt;
+            if (state.debt < 0) state.debt = 0;
+            state.happiness = Math.min(100, Math.max(10, state.happiness + choice.happy));
+
+            state.log.unshift({
+                day: state.day,
+                text: choice.log,
+                type: choice.cost < 0 ? 'income' : 'expense'
+            });
+
+            state.day += 1;
+            localStorage.setItem('marketScholar_cyoa_v2_state', JSON.stringify(state));
+            renderUI();
+        }
+
+        function renderLog() {
+            const logContainer = document.getElementById('actionLog');
+            if (!state.log.length) {
+                logContainer.innerHTML = '<p class="text-muted small">Decisions will appear here as you play.</p>';
+                return;
+            }
+            logContainer.innerHTML = state.log.map(i => `
+                <div class="log-item ${i.type}">
+                    <strong>Day ${i.day}:</strong> ${i.text}
+                </div>
+            `).join('');
+        }
+
+        function applySetup() {
+            const duration = document.getElementById('durationSelect').value;
+            const cash = parseFloat(document.getElementById('cashInput').value) || 0;
+            const debt = parseFloat(document.getElementById('debtInput').value) || 0;
+
+            state = {
+                duration: duration,
+                day: 1,
+                cash: cash,
+                debt: debt,
+                happiness: 80,
+                log: []
+            };
+
+            localStorage.setItem('marketScholar_cyoa_v2_state', JSON.stringify(state));
+            
+            const modalEl = document.getElementById('setupModal');
+            bootstrap.Modal.getInstance(modalEl).hide();
+
+            document.getElementById('scenarioContainer').style.display = 'block';
+            document.getElementById('endGameContainer').style.display = 'none';
+
+            renderUI();
+        }
+
+        function showEndGameScreen() {
+            document.getElementById('scenarioContainer').style.display = 'none';
+            document.getElementById('endGameContainer').style.display = 'block';
+
+            const fmt = num => '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('finalCash').innerText = fmt(state.cash);
+            document.getElementById('finalDebt').innerText = fmt(state.debt);
+            document.getElementById('finalHappiness').innerText = `${state.happiness}%`;
+
+            const badge = document.getElementById('personaBadge');
+            if (state.cash > 500 && state.debt === 0) {
+                badge.innerText = "🏆 Strategic Financier";
+                badge.className = "badge bg-success fs-6 px-3 py-2";
+            } else if (state.cash >= 0) {
+                badge.innerText = "⚖️ Balanced Budgeter";
+                badge.className = "badge bg-primary fs-6 px-3 py-2";
+            } else {
+                badge.innerText = "⚠️ High Debt Overspender";
+                badge.className = "badge bg-danger fs-6 px-3 py-2";
+            }
+        }
+
+        function resetQuest() {
+            if (confirm("Reset current simulation run?")) {
+                const modal = new bootstrap.Modal(document.getElementById('setupModal'));
+                modal.show();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketScholar | Financial Education & Trading Sandbox</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* 1. Home Page Palette */
+:root {
+  --primary-accent: #6C5CE7;   /* Electric Violet */
+  --secondary-accent: #00CECE; /* Bright Turquoise */
+  --bg-gradient: linear-gradient(135deg, #6C5CE7, #00CECE);
+  --glow-shadow: 0 4px 20px rgba(108, 92, 231, 0.4);
+}
+
+.hero-button, .highlight-card {
+  background: var(--bg-gradient);
+  box-shadow: var(--glow-shadow);
+}
+        :root {
+            --bg-dark: #070814;
+            --card-bg: rgba(20, 23, 43, 0.65);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --accent-glow: rgba(139, 92, 246, 0.25);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Ambient Glow Backgrounds */
+        .ambient-glow-1 {
+            position: absolute;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(59, 130, 246, 0.1) 40%, rgba(7, 8, 20, 0) 70%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .ambient-glow-2 {
+            position: absolute;
+            top: 40%;
+            left: 20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, rgba(7, 8, 20, 0) 70%);
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Modern Glass Navbar */
+        .navbar-custom {
+            background: rgba(11, 13, 28, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 18px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.35rem;
+            letter-spacing: -0.5px;
+            color: #ffffff !important;
+        }
+
+        .nav-link {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin: 0 10px;
+            transition: all 0.25s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff !important;
+        }
+
+        /* Custom Modern Pill Buttons */
+        .btn-purple {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 9999px;
+            padding: 12px 28px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 20px var(--accent-glow);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-purple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(139, 92, 246, 0.45);
+            color: #ffffff;
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            border: 1px solid var(--card-border);
+            border-radius: 9999px;
+            padding: 12px 28px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            z-index: 1;
+            padding: 90px 0 60px;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-weight: 800;
+            font-size: 3.5rem;
+            line-height: 1.15;
+            letter-spacing: -1.5px;
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 24px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 620px;
+            margin: 0 auto 36px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Glassmorphic Feature Cards */
+        .feature-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 32px 28px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(139, 92, 246, 0.35);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(139, 92, 246, 0.15);
+        }
+
+        .feature-icon-wrapper {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: rgba(139, 92, 246, 0.12);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.35rem; }
+            .hero-subtitle { font-size: 1rem; }
+        }
+
+        body {
+            color: white !important; /* or #ffffff */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <span style="color: var(--accent-purple);">❖</span> MarketScholar
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/dashboard">Trading Floor</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/budget">Budget Quest</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/learn">Knowledge Hub</a></li>
+                </ul>
+                <div class="d-flex gap-2 mt-3 mt-lg-0">
+                    <a href="/dashboard" class="btn btn-purple btn-sm px-4">Enter Sandbox</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="container hero-section">
+        <h1 class="hero-title">Elevate Your Financial Experience</h1>
+        <p class="hero-subtitle">
+            Unlock your full trading potential in a risk-free, real-time simulated environment powered by live market data and interactive AI guidance.
+        </p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="/dashboard" class="btn btn-purple">Start Paper Trading</a>
+            <a href="/learn" class="btn btn-glass">Explore Modules</a>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container my-5 relative-container" style="z-index: 1;">
+        <div class="row g-4">
+            
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">📈</div>
+                    <h3 class="h5 fw-bold text-white mb-2">Paper Trading Floor</h3>
+                    <p class="text-muted small mb-4 flex-grow-1" style="line-height: 1.6;">
+                        Simulate equity investments using live US market prices. Analyze candlestick charts, apply SMA indicators, and execute buys or sells with zero real cash risk.
+                    </p>
+                    <a href="/dashboard" class="btn btn-glass btn-sm w-100 text-center">Open Floor</a>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">🎮</div>
+                    <h3 class="h5 fw-bold text-white mb-2">Budget Quest Simulator</h3>
+                    <p class="text-muted small mb-4 flex-grow-1" color="text-white" style="line-height: 1.6;">
+                        Navigate interactive real-life choices, balance checking accounts against credit card debt, and build sustainable long-term cashflow habits.
+                    </p>
+                    <a href="/budget" class="btn btn-glass btn-sm w-100 text-center">Launch Quest</a>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">🤖</div>
+                    <h3 class="h5 fw-bold text-white mb-2">AI Knowledge Hub</h3>
+                    <p class="text-muted small mb-4 flex-grow-1" style="line-height: 1.6;">
+                        Master budgeting 101, credit score mechanics, and investment strategies with interactive quizzes and our embedded Groq-powered AI personal finance tutor.
+                    </p>
+                    <a href="/learn" class="btn btn-glass btn-sm w-100 text-center">Start Learning</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

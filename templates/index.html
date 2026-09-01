@@ -231,8 +231,14 @@
                     <li class="nav-item"><a class="nav-link" href="/budget">Budget Quest</a></li>
                     <li class="nav-item"><a class="nav-link" href="/learn">Knowledge Hub</a></li>
                 </ul>
-                <div class="d-flex gap-2 mt-3 mt-lg-0">
-                    <a href="/dashboard" class="btn btn-purple btn-sm px-4">Enter Sandbox</a>
+                <div class="d-flex gap-2 mt-3 mt-lg-0 align-items-center">
+                    {% if current_user %}
+                        <span class="text-muted small fw-semibold me-1">👤 {{ current_user }}</span>
+                        <a href="/api/auth/logout" class="btn btn-glass btn-sm px-4">Log Out</a>
+                    {% else %}
+                        <a href="/login" class="btn btn-glass btn-sm px-4">Log In</a>
+                        <a href="/signup" class="btn btn-purple btn-sm px-4">Sign Up</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

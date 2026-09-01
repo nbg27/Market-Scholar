@@ -1,16 +1,31 @@
 import os
+import bcrypt
 from datetime import datetime, timedelta, timezone
+from functools import wraps
 
-from flask import Flask, request, jsonify, render_template
+from dotenv import load_dotenv
+load_dotenv()  # Load .env variables before any os.environ.get() calls
+
+from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 import finnhub
 import yfinance as yf
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest, StockLatestTradeRequest
 from alpaca.data.timeframe import TimeFrame, TimeFrameUnit
 from alpaca.data.enums import DataFeed
+from supabase import create_client, Client
 
 app = Flask(__name__, template_folder="../templates")
 
+# ── Secret key for Flask session cookies ─────────────────────────────────────
+app.secret_key = os.environ.get("SECRET_KEY", "change-me-in-production")
+
+# ── Supabase Client ───────────────────────────────────────────────────────────
+SUPABASE_URL: str = os.environ.get("SUPABASE_URL", "")
+SUPABASE_KEY: str = os.environ.get("SUPABASE_KEY", "")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# ── External API keys ─────────────────────────────────────────────────────────
 FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY", "")
 finnhub_client = finnhub.Client(api_key=FINNHUB_API_KEY) if FINNHUB_API_KEY else None
 
@@ -26,6 +41,18 @@ RANGE_TO_ALPACA = {
 }
 
 
+# ── Auth Helpers ──────────────────────────────────────────────────────────────
+def login_required(f):
+    """Decorator that redirects unauthenticated users to /login."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect(url_for("login_page"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+# ── Alpaca Helpers ────────────────────────────────────────────────────────────
 def alpaca_configured():
     return bool(ALPACA_API_KEY and ALPACA_SECRET_KEY)
 
@@ -435,11 +462,26 @@ MODULES_BY_ID = {m["id"]: m for m in MODULES}
 # ── Page Routes ──────────────────────────────────────────────────────────────
 @app.route("/", methods=["GET"])
 def home():
-    return render_template("index.html")
+    return render_template("index.html", current_user=session.get("username"))
+
+@app.route("/login", methods=["GET"])
+def login_page():
+    # Redirect already-logged-in users straight to the dashboard
+    if "user_id" in session:
+        return redirect(url_for("dashboard"))
+    return render_template("login.html")
+
+@app.route("/signup", methods=["GET"])
+def signup_page():
+    # Redirect already-logged-in users straight to the dashboard
+    if "user_id" in session:
+        return redirect(url_for("dashboard"))
+    return render_template("signup.html")
 
 @app.route("/dashboard", methods=["GET"])
+@login_required
 def dashboard():
-    return render_template("dashboard.html")
+    return render_template("dashboard.html", current_user=session.get("username"))
 
 @app.route("/api/get-bars", methods=["GET"])
 def get_bars():
@@ -481,19 +523,22 @@ def get_live_price():
 
 
 @app.route("/learn", methods=["GET"])
+@login_required
 def learn():
-    return render_template("learn.html", modules=MODULES)
+    return render_template("learn.html", modules=MODULES, current_user=session.get("username"))
 
 @app.route("/learn/<module_id>", methods=["GET"])
+@login_required
 def module_detail(module_id):
     module = MODULES_BY_ID.get(module_id)
     if not module:
-        return render_template("learn.html", modules=MODULES), 404
-    return render_template("module_detail.html", module=module)
+        return render_template("learn.html", modules=MODULES, current_user=session.get("username")), 404
+    return render_template("module_detail.html", module=module, current_user=session.get("username"))
 
 @app.route("/budget", methods=["GET"])
+@login_required
 def budget():
-    return render_template("budget.html")
+    return render_template("budget.html", current_user=session.get("username"))
 
 # 2. Stock Quote API Route
 @app.route("/api/get-quote", methods=["GET"])
@@ -600,6 +645,101 @@ def ask_ai():
         return jsonify({"answer": answer})
     except Exception as err:
         return jsonify({"error": f"AI request failed: {err}"}), 502
+
+
+# ── Auth API Routes ───────────────────────────────────────────────────────────
+
+@app.route("/api/auth/signup", methods=["POST"])
+def auth_signup():
+    """
+    Register a new user.
+    Expects JSON: { "username": str, "password": str }
+    Stores a bcrypt hash of the password in the Supabase 'users' table.
+    """
+    data = request.get_json(silent=True) or {}
+    username = data.get("username", "").strip()
+    password = data.get("password", "")
+
+    if not username or not password:
+        return jsonify({"error": "Username and password are required."}), 400
+
+    if len(password) < 8:
+        return jsonify({"error": "Password must be at least 8 characters."}), 400
+
+    if len(username) < 3:
+        return jsonify({"error": "Username must be at least 3 characters."}), 400
+
+    try:
+        # Check whether username already exists
+        existing = supabase.table("users").select("id").eq("username", username).execute()
+        if existing.data:
+            return jsonify({"error": "Username already taken. Please choose another."}), 409
+
+        # Hash password with bcrypt
+        password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+        # Insert new user row
+        result = supabase.table("users").insert({
+            "username": username,
+            "password_hash": password_hash,
+        }).execute()
+
+        new_user = result.data[0]
+
+        # Log the user in immediately after signup
+        session["user_id"] = new_user["id"]
+        session["username"] = new_user["username"]
+
+        return jsonify({"message": "Account created successfully.", "username": username}), 201
+
+    except Exception as err:
+        print(f"Signup error: {err}")
+        return jsonify({"error": "An unexpected error occurred. Please try again."}), 500
+
+
+@app.route("/api/auth/login", methods=["POST"])
+def auth_login():
+    """
+    Authenticate an existing user.
+    Expects JSON: { "username": str, "password": str }
+    Sets a server-side session on success.
+    """
+    data = request.get_json(silent=True) or {}
+    username = data.get("username", "").strip()
+    password = data.get("password", "")
+
+    if not username or not password:
+        return jsonify({"error": "Username and password are required."}), 400
+
+    try:
+        result = supabase.table("users").select("id, username, password_hash").eq("username", username).execute()
+
+        if not result.data:
+            return jsonify({"error": "Invalid username or password."}), 401
+
+        user = result.data[0]
+        stored_hash = user["password_hash"].encode("utf-8")
+
+        # Verify password against stored bcrypt hash
+        if not bcrypt.checkpw(password.encode("utf-8"), stored_hash):
+            return jsonify({"error": "Invalid username or password."}), 401
+
+        # Set session
+        session["user_id"] = user["id"]
+        session["username"] = user["username"]
+
+        return jsonify({"message": "Login successful.", "username": user["username"]}), 200
+
+    except Exception as err:
+        print(f"Login error: {err}")
+        return jsonify({"error": "An unexpected error occurred. Please try again."}), 500
+
+
+@app.route("/api/auth/logout", methods=["GET"])
+def auth_logout():
+    """Clear the session and redirect to the login page."""
+    session.clear()
+    return redirect(url_for("login_page"))
 
 
 if __name__ == "__main__":

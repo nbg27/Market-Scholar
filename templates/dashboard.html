@@ -185,12 +185,21 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                     <li class="nav-item"><a class="nav-link active" href="/dashboard">Trading Floor</a></li>
                     <li class="nav-item"><a class="nav-link" href="/budget">Budget Quest</a></li>
                     <li class="nav-item"><a class="nav-link" href="/learn">Knowledge Hub</a></li>
                 </ul>
+                <div class="d-flex gap-2 align-items-center">
+                    {% if current_user %}
+                        <span class="text-muted small fw-semibold me-1">👤 {{ current_user }}</span>
+                        <a href="/api/auth/logout" class="btn btn-outline-light btn-sm px-3" style="border-radius: 8px;">Log Out</a>
+                    {% else %}
+                        <a href="/login" class="btn btn-outline-light btn-sm px-3" style="border-radius: 8px;">Log In</a>
+                        <a href="/signup" class="btn btn-purple btn-sm px-3" style="border-radius: 8px;">Sign Up</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
